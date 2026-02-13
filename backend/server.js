@@ -17,7 +17,16 @@ connectDB();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+const corsOptions = {
+  origin: [
+    'https://ocr-app-frontend.onrender.com', // Your frontend URL
+    'http://localhost:5173', // Local development
+    'http://localhost:3000'
+  ],
+  credentials: true
+};
 
+app.use(cors(corsOptions));
 // Serve uploaded files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
