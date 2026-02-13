@@ -25,6 +25,8 @@ fun WebViewScreen(modifier: Modifier = Modifier) {
                     cacheMode = WebSettings.LOAD_DEFAULT
                     allowFileAccess = true
                     allowContentAccess = true
+                    allowFileAccessFromFileURLs = true
+                    allowUniversalAccessFromFileURLs = true
                 }
 
                 // Load the Angular app from assets

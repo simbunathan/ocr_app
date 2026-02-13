@@ -13,9 +13,11 @@ body {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   min-height: 100vh;
 }
-#root{
-    width:100%;
+
+#root {
+  width: 100%;
 }
+
 .app {
   min-height: 100vh;
 }
@@ -71,6 +73,7 @@ body {
 
 /* Main Content */
 .main-content {
+  margin-top: 10px;
   max-width: 1200px;
   /* margin: 2rem auto; */
   padding: 0 1rem;

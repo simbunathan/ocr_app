@@ -8,6 +8,8 @@ const OCRScanner = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  const [lastRecordId, setLastRecordId] = useState(null);
+
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -15,6 +17,7 @@ const OCRScanner = () => {
       setPreview(URL.createObjectURL(file));
       setExtractedText('');
       setError('');
+      setLastRecordId(null);
     }
   };
 
@@ -33,6 +36,7 @@ const OCRScanner = () => {
     try {
       const { data } = await ocrAPI.processImage(formData);
       setExtractedText(data.text);
+      setLastRecordId(data.recordId);
     } catch (err) {
       setError(err.response?.data?.error || 'Error processing image');
     } finally {
@@ -40,11 +44,35 @@ const OCRScanner = () => {
     }
   };
 
+  const handleExport = (type) => {
+    if (!lastRecordId) return;
+    const token = localStorage.getItem('token');
+    const url = `${import.meta.env.VITE_API_URL}/ocr/export/${type}/${lastRecordId}`;
+
+    // Create a temporary link to trigger download with auth token (simple GET with token if backend supports it or use blob)
+    // For simplicity, we'll try fetch and blob
+    fetch(url, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+      .then(res => res.blob())
+      .then(blob => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `OCR_Export_${lastRecordId}.${type === 'pdf' ? 'pdf' : 'xlsx'}`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      })
+      .catch(err => console.error('Export error:', err));
+  };
+
   const handleClear = () => {
     setSelectedFile(null);
     setPreview(null);
     setExtractedText('');
     setError('');
+    setLastRecordId(null);
   };
 
   const handleCopy = () => {
@@ -88,6 +116,26 @@ const OCRScanner = () => {
           >
             {loading ? '⏳ Processing...' : '🔍 Extract Text'}
           </button>
+
+          {extractedText && (
+            <>
+              <button
+                onClick={() => handleExport('pdf')}
+                className="btn btn-pdf"
+                style={{ backgroundColor: '#e74c3c', color: 'white' }}
+              >
+                📄 PDF
+              </button>
+              <button
+                onClick={() => handleExport('excel')}
+                className="btn btn-excel"
+                style={{ backgroundColor: '#27ae60', color: 'white' }}
+              >
+                📊 Excel
+              </button>
+            </>
+          )}
+
           <button onClick={handleClear} className="btn btn-secondary">
             🗑️ Clear
           </button>

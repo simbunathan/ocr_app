@@ -18,7 +18,7 @@ const storage = multer.diskStorage({
 const upload = multer({
   storage,
   fileFilter: (req, file, cb) => {
-    const allowedTypes = /jpeg|jpg|png|gif|bmp/;
+    const allowedTypes = /jpeg|jpg|png|gif|bmp|jfif/;
     const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
     const mimetype = allowedTypes.test(file.mimetype);
 
@@ -34,5 +34,7 @@ const upload = multer({
 router.post('/process', auth, upload.single('image'), ocrController.processOCR);
 router.get('/history', auth, ocrController.getHistory);
 router.delete('/record/:id', auth, ocrController.deleteRecord);
+router.get('/export/pdf/:id', auth, ocrController.exportToPDF);
+router.get('/export/excel/:id', auth, ocrController.exportToExcel);
 
 module.exports = router;
